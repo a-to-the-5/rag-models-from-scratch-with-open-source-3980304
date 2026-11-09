@@ -87,5 +87,13 @@ WORKDIR /home/$USERNAME
 RUN pip3 install --upgrade pip && \
     pip3 install ollama sentence-transformers nltk sqlalchemy pgvector psycopg2-binary wikipedia
 
+RUN python3 -c "import nltk; nltk.download('punkt_tab')"
+
+COPY .devcontainer/seed.sql /tmp/seed.sql
+RUN sudo service postgresql start
+RUN cat /tmp/seed.sql | psql -h localhost -U postgres -f-
+
 # Expose PostgreSQL default port
 EXPOSE 5432
+
+ENTRYPOINT sudo service postgresql start && /bin/bash
